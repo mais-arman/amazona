@@ -22,7 +22,7 @@ import OrderHistoryScreen from './screens/OrderHistoryScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import Button from 'react-bootstrap/Button';
 import { getError } from './utils';
-import axios from 'axios';
+
 import SearchBox from './components/SearchBox';
 import SearchScreen from './screens/SearchScreen';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -36,7 +36,7 @@ import UserEditScreen from './screens/UserEditScreen';
 import MapScreen from './screens/MapScreen';
 import ForgetPasswordScreen from './screens/ForgetPasswordScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
-
+import api from './api';
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { fullBox, cart, userInfo } = state;
@@ -54,7 +54,7 @@ function App() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get(`/api/products/categories`);
+       const { data } = await api.get(`/products/categories`);
         setCategories(data);
       } catch (err) {
         toast.error(getError(err));

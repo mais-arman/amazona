@@ -8,7 +8,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api'; // ✅ بدل axios
 
 export default function CartScreen() {
   const navigate = useNavigate();
@@ -18,16 +18,19 @@ export default function CartScreen() {
   } = state;
 
   const updateCartHandler = async (item, quantity) => {
-    const { data } = await axios.get(`/api/products/${item._id}`);
+    const { data } = await api.get(`/products/${item._id}`); // ✅ بدون /api
+
     if (data.countInStock < quantity) {
       window.alert('Sorry. Product is out of stock');
       return;
     }
+
     ctxDispatch({
       type: 'CART_ADD_ITEM',
       payload: { ...item, quantity },
     });
   };
+
   const removeItemHandler = (item) => {
     ctxDispatch({ type: 'CART_REMOVE_ITEM', payload: item });
   };
@@ -41,7 +44,9 @@ export default function CartScreen() {
       <Helmet>
         <title>Shopping Cart</title>
       </Helmet>
+
       <h1>Shopping Cart</h1>
+
       <Row>
         <Col md={8}>
           {cartItems.length === 0 ? (
@@ -58,9 +63,10 @@ export default function CartScreen() {
                         src={item.image}
                         alt={item.name}
                         className="img-fluid rounded img-thumbnail"
-                      ></img>{' '}
+                      />
                       <Link to={`/product/${item.slug}`}>{item.name}</Link>
                     </Col>
+
                     <Col md={3}>
                       <Button
                         onClick={() =>
@@ -82,7 +88,9 @@ export default function CartScreen() {
                         <i className="fas fa-plus-circle"></i>
                       </Button>
                     </Col>
+
                     <Col md={3}>${item.price}</Col>
+
                     <Col md={2}>
                       <Button
                         onClick={() => removeItemHandler(item)}
@@ -97,6 +105,7 @@ export default function CartScreen() {
             </ListGroup>
           )}
         </Col>
+
         <Col md={4}>
           <Card>
             <Card.Body>
@@ -108,6 +117,7 @@ export default function CartScreen() {
                     {cartItems.reduce((a, c) => a + c.price * c.quantity, 0)}
                   </h3>
                 </ListGroup.Item>
+
                 <ListGroup.Item>
                   <div className="d-grid">
                     <Button

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useContext, useEffect, useReducer } from 'react';
 import { toast } from 'react-toastify';
 import Button from 'react-bootstrap/Button';
@@ -8,52 +7,65 @@ import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import { Store } from '../Store';
 import { getError } from '../utils';
+import api from '../api'; // ✅ أهم تغيير
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
       return { ...state, loading: true };
+
     case 'FETCH_SUCCESS':
       return {
         ...state,
         orders: action.payload,
         loading: false,
       };
+
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
+
     case 'DELETE_REQUEST':
       return { ...state, loadingDelete: true, successDelete: false };
+
     case 'DELETE_SUCCESS':
       return {
         ...state,
         loadingDelete: false,
         successDelete: true,
       };
+
     case 'DELETE_FAIL':
       return { ...state, loadingDelete: false };
+
     case 'DELETE_RESET':
       return { ...state, loadingDelete: false, successDelete: false };
+
     default:
       return state;
   }
 };
+
 export default function OrderListScreen() {
   const navigate = useNavigate();
   const { state } = useContext(Store);
   const { userInfo } = state;
+
   const [{ loading, error, orders, loadingDelete, successDelete }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
+      orders: [],
     });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         dispatch({ type: 'FETCH_REQUEST' });
-        const { data } = await axios.get(`/api/orders`, {
+
+        const { data } = await api.get(`/orders`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
+
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
         dispatch({
@@ -62,6 +74,7 @@ export default function OrderListScreen() {
         });
       }
     };
+
     if (successDelete) {
       dispatch({ type: 'DELETE_RESET' });
     } else {
@@ -73,16 +86,16 @@ export default function OrderListScreen() {
     if (window.confirm('Are you sure to delete?')) {
       try {
         dispatch({ type: 'DELETE_REQUEST' });
-        await axios.delete(`/api/orders/${order._id}`, {
+
+        await api.delete(`/orders/${order._id}`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
+
         toast.success('order deleted successfully');
         dispatch({ type: 'DELETE_SUCCESS' });
       } catch (err) {
-        toast.error(getError(error));
-        dispatch({
-          type: 'DELETE_FAIL',
-        });
+        toast.error(getError(err));
+        dispatch({ type: 'DELETE_FAIL' });
       }
     }
   };
@@ -92,10 +105,13 @@ export default function OrderListScreen() {
       <Helmet>
         <title>Orders</title>
       </Helmet>
+
       <h1>Orders</h1>
-      {loadingDelete && <LoadingBox></LoadingBox>}
+
+      {loadingDelete && <LoadingBox />}
+
       {loading ? (
-        <LoadingBox></LoadingBox>
+        <LoadingBox />
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
@@ -111,6 +127,7 @@ export default function OrderListScreen() {
               <th>ACTIONS</th>
             </tr>
           </thead>
+
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
@@ -119,7 +136,6 @@ export default function OrderListScreen() {
                 <td>{order.createdAt.substring(0, 10)}</td>
                 <td>{order.totalPrice.toFixed(2)}</td>
                 <td>{order.isPaid ? order.paidAt.substring(0, 10) : 'No'}</td>
-
                 <td>
                   {order.isDelivered
                     ? order.deliveredAt.substring(0, 10)
@@ -129,13 +145,13 @@ export default function OrderListScreen() {
                   <Button
                     type="button"
                     variant="light"
-                    onClick={() => {
-                      navigate(`/order/${order._id}`);
-                    }}
+                    onClick={() => navigate(`/order/${order._id}`)}
                   >
                     Details
                   </Button>
+
                   &nbsp;
+
                   <Button
                     type="button"
                     variant="light"

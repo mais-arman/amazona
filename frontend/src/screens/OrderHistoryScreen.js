@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import { Helmet } from 'react-helmet-async';
-import axios from 'axios';
+import api from '../api'; // ✅ بدل axios
 import { useNavigate } from 'react-router-dom';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import { Store } from '../Store';
 import { getError } from '../utils';
-import Button from 'react-bootstrap/esm/Button';
+import Button from 'react-bootstrap/Button';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -30,15 +30,16 @@ export default function OrderHistoryScreen() {
     loading: true,
     error: '',
   });
+
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
-      try {
-        const { data } = await axios.get(
-          `/api/orders/mine`,
 
-          { headers: { Authorization: `Bearer ${userInfo.token}` } }
-        );
+      try {
+        const { data } = await api.get('/orders/mine', { // ✅ بدون /api
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+        });
+
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
       } catch (error) {
         dispatch({
@@ -47,8 +48,10 @@ export default function OrderHistoryScreen() {
         });
       }
     };
+
     fetchData();
   }, [userInfo]);
+
   return (
     <div>
       <Helmet>
@@ -56,8 +59,9 @@ export default function OrderHistoryScreen() {
       </Helmet>
 
       <h1>Order History</h1>
+
       {loading ? (
-        <LoadingBox></LoadingBox>
+        <LoadingBox />
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
@@ -72,6 +76,7 @@ export default function OrderHistoryScreen() {
               <th>ACTIONS</th>
             </tr>
           </thead>
+
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
@@ -79,18 +84,12 @@ export default function OrderHistoryScreen() {
                 <td>{order.createdAt.substring(0, 10)}</td>
                 <td>{order.totalPrice.toFixed(2)}</td>
                 <td>{order.isPaid ? order.paidAt.substring(0, 10) : 'No'}</td>
-                <td>
-                  {order.isDelivered
-                    ? order.deliveredAt.substring(0, 10)
-                    : 'No'}
-                </td>
+                <td>{order.isDelivered ? order.deliveredAt.substring(0, 10) : 'No'}</td>
                 <td>
                   <Button
                     type="button"
                     variant="light"
-                    onClick={() => {
-                      navigate(`/order/${order._id}`);
-                    }}
+                    onClick={() => navigate(`/order/${order._id}`)}
                   >
                     Details
                   </Button>
