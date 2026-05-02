@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import Chart from 'react-google-charts';
-import api from '../api'; 
+import api from '../api';
 import { Store } from '../Store';
 import { getError } from '../utils';
 import LoadingBox from '../components/LoadingBox';
@@ -38,7 +38,7 @@ export default function DashboardScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data } = await api.get('/orders/summary', { // ✅ بدون /api
+        const { data } = await api.get('/orders/summary', {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
 

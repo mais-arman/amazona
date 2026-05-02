@@ -27,19 +27,26 @@ mongoose
 const app = express();
 
 // =======================
-// Middleware (IMPORTANT ORDER)
+// Middleware
 // =======================
+const allowedOrigins = [
+  'http://amazona-frontend-366707332486-us-east-1-an.s3-website-us-east-1.amazonaws.com',
+  'https://d2rnhi1i7h8w6o.cloudfront.net',
+];
 
-// Allow all origins (for testing / AWS project)
-app.use(cors({
-  origin: true,
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-// Handle preflight requests
-app.options("*", cors());
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -47,7 +54,6 @@ app.use(express.urlencoded({ extended: true }));
 // =======================
 // API Routes
 // =======================
-
 app.get('/api/keys/paypal', (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID || 'sb');
 });
@@ -63,21 +69,19 @@ app.use('/api/users', userRouter);
 app.use('/api/orders', orderRouter);
 
 // =======================
-// Frontend Build (React)
+// Frontend Build
 // =======================
-
 const __dirname = path.resolve();
 
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
 app.get('*', (req, res) =>
-  res.sendFile(path.join(__dirname, '../frontend/build/index.html'))
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html')),
 );
 
 // =======================
 // Error Handler
 // =======================
-
 app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });
 });
@@ -85,7 +89,6 @@ app.use((err, req, res, next) => {
 // =======================
 // Server Start
 // =======================
-
 const port = process.env.PORT || 4000;
 
 app.listen(port, () => {
