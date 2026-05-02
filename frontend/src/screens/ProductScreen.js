@@ -1,4 +1,4 @@
-import api from '../api'; // 👈 بدل axios
+import api from '../api'; 
 import { useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
@@ -62,7 +62,7 @@ function ProductScreen() {
       dispatch({ type: 'FETCH_REQUEST' });
 
       try {
-        const { data } = await api.get(`/products/slug/${slug}`);
+        const { data } = await api.get(`/api/products/slug/${slug}`);
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
       } catch (err) {
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
@@ -79,7 +79,7 @@ function ProductScreen() {
     const existItem = cart.cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
 
-    const { data } = await api.get(`/products/${product._id}`);
+    const { data } = await api.get(`/api/products/${product._id}`);
 
     if (data.countInStock < quantity) {
       window.alert('Sorry. Product is out of stock');
@@ -104,7 +104,7 @@ function ProductScreen() {
 
     try {
       const { data } = await api.post(
-        `/products/${product._id}/reviews`,
+        `/api/products/${product._id}/reviews`,
         { rating, comment, name: userInfo.name },
         {
           headers: {

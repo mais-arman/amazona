@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import api from '../api'; // 👈 استخدام axios instance
+import api from '../api'; 
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
 import { Helmet } from 'react-helmet-async';
@@ -73,7 +73,7 @@ export default function SearchScreen() {
         dispatch({ type: 'FETCH_REQUEST' });
 
         const { data } = await api.get(
-          `/products/search?page=${page}&query=${query}&category=${category}&price=${price}&rating=${rating}&order=${order}`
+          `/api/products/search?page=${page}&query=${query}&category=${category}&price=${price}&rating=${rating}&order=${order}`
         );
 
         dispatch({ type: 'FETCH_SUCCESS', payload: data });
@@ -93,7 +93,7 @@ export default function SearchScreen() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await api.get('/products/categories');
+        const { data } = await api.get('/api/products/categories');
         setCategories(data);
       } catch (err) {
         toast.error(getError(err));

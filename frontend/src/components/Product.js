@@ -2,7 +2,7 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 import Rating from './Rating';
-import api from '../api'; // ✅ بدل axios
+import api from '../api'; 
 import { useContext } from 'react';
 import { Store } from '../Store';
 
@@ -19,7 +19,7 @@ function Product(props) {
     const quantity = existItem ? existItem.quantity + 1 : 1;
 
     // ✅ تم التعديل هنا
-    const { data } = await api.get(`/products/${item._id}`);
+    const { data } = await api.get(`/api/products/${item._id}`);
 
     if (data.countInStock < quantity) {
       window.alert('Sorry. Product is out of stock');

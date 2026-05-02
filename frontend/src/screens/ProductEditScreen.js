@@ -78,7 +78,7 @@ export default function ProductEditScreen() {
       try {
         dispatch({ type: 'FETCH_REQUEST' });
 
-        const { data } = await api.get(`/products/${productId}`);
+        const { data } = await api.get(`/api/products/${productId}`);
 
         setName(data.name);
         setSlug(data.slug);
@@ -109,7 +109,7 @@ export default function ProductEditScreen() {
       dispatch({ type: 'UPDATE_REQUEST' });
 
       await api.put(
-        `/products/${productId}`,
+        `/api/products/${productId}`,
         {
           _id: productId,
           name,

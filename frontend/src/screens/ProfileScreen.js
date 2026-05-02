@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
+import api from '../api';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -14,7 +15,6 @@ const reducer = (state, action) => {
       return { ...state, loadingUpdate: false };
     case 'UPDATE_FAIL':
       return { ...state, loadingUpdate: false };
-
     default:
       return state;
   }
@@ -23,6 +23,7 @@ const reducer = (state, action) => {
 export default function ProfileScreen() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
+
   const [name, setName] = useState(userInfo.name);
   const [email, setEmail] = useState(userInfo.email);
   const [password, setPassword] = useState('');
@@ -34,8 +35,16 @@ export default function ProfileScreen() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
     try {
-      const { data } = await axios.put(
+      dispatch({ type: 'UPDATE_REQUEST' });
+
+      const { data } = await api.put(
         '/api/users/profile',
         {
           name,
@@ -43,19 +52,20 @@ export default function ProfileScreen() {
           password,
         },
         {
-          headers: { Authorization: `Bearer ${userInfo.token}` },
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
         }
       );
-      dispatch({
-        type: 'UPDATE_SUCCESS',
-      });
+
+      dispatch({ type: 'UPDATE_SUCCESS' });
+
       ctxDispatch({ type: 'USER_SIGNIN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
+
       toast.success('User updated successfully');
     } catch (err) {
-      dispatch({
-        type: 'FETCH_FAIL',
-      });
+      dispatch({ type: 'UPDATE_FAIL' });
       toast.error(getError(err));
     }
   };
@@ -65,8 +75,10 @@ export default function ProfileScreen() {
       <Helmet>
         <title>User Profile</title>
       </Helmet>
+
       <h1 className="my-3">User Profile</h1>
-      <form onSubmit={submitHandler}>
+
+      <Form onSubmit={submitHandler}>
         <Form.Group className="mb-3" controlId="name">
           <Form.Label>Name</Form.Label>
           <Form.Control
@@ -75,7 +87,8 @@ export default function ProfileScreen() {
             required
           />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="name">
+
+        <Form.Group className="mb-3" controlId="email">
           <Form.Label>Email</Form.Label>
           <Form.Control
             type="email"
@@ -84,6 +97,7 @@ export default function ProfileScreen() {
             required
           />
         </Form.Group>
+
         <Form.Group className="mb-3" controlId="password">
           <Form.Label>Password</Form.Label>
           <Form.Control
@@ -91,17 +105,17 @@ export default function ProfileScreen() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="password">
+
+        <Form.Group className="mb-3" controlId="confirmPassword">
           <Form.Label>Confirm Password</Form.Label>
           <Form.Control
             type="password"
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </Form.Group>
-        <div className="mb-3">
-          <Button type="submit">Update</Button>
-        </div>
-      </form>
+
+        <Button type="submit">Update</Button>
+      </Form>
     </div>
   );
 }

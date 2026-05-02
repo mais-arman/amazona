@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from "react";
-import api from "../api"; // ✅ بدل axios
+import api from "../api"; 
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Product from "../components/Product";
@@ -31,7 +31,7 @@ function HomeScreen() {
     const fetchData = async () => {
       dispatch({ type: "FETCH_REQUEST" });
       try {
-        const result = await api.get("/products"); // ✅ بدون /api
+        const result = await api.get("/api/products"); // ✅ بدون /api
         dispatch({ type: "FETCH_SUCCESS", payload: result.data });
       } catch (err) {
         dispatch({ type: "FETCH_FAIL", payload: err.message });

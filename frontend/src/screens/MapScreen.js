@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Store } from '../Store';
 import Button from 'react-bootstrap/Button';
 import { toast } from 'react-toastify';
+import api from '../api';
 
 const defaultLocation = { lat: 45.516, lng: -73.56 };
 const libs = ['places'];
@@ -17,6 +18,7 @@ export default function MapScreen() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
   const navigate = useNavigate();
+
   const [googleApiKey, setGoogleApiKey] = useState('');
   const [center, setCenter] = useState(defaultLocation);
   const [location, setLocation] = useState(center);
@@ -27,7 +29,7 @@ export default function MapScreen() {
 
   const getUserCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation os not supported by this browser');
+      alert('Geolocation is not supported by this browser');
     } else {
       navigator.geolocation.getCurrentPosition((position) => {
         setCenter({
@@ -41,24 +43,31 @@ export default function MapScreen() {
       });
     }
   };
+
   useEffect(() => {
     const fetch = async () => {
-      const { data } = await axios('/api/keys/google', {
-        headers: { Authorization: `BEARER ${userInfo.token}` },
-      });
-      setGoogleApiKey(data.key);
-      getUserCurrentLocation();
+      try {
+        const { data } = await api.get('/api/keys/google', {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+        });
+        setGoogleApiKey(data.key);
+        getUserCurrentLocation();
+      } catch (err) {
+        toast.error('Failed to load Google Maps key');
+      }
     };
 
     fetch();
+
     ctxDispatch({
       type: 'SET_FULLBOX_ON',
     });
-  }, [ctxDispatch]);
+  }, [ctxDispatch, userInfo]);
 
   const onLoad = (map) => {
     mapRef.current = map;
   };
+
   const onIdle = () => {
     setLocation({
       lat: mapRef.current.center.lat(),
@@ -69,6 +78,7 @@ export default function MapScreen() {
   const onLoadPlaces = (place) => {
     placeRef.current = place;
   };
+
   const onPlacesChanged = () => {
     const place = placeRef.current.getPlaces()[0].geometry.location;
     setCenter({ lat: place.lat(), lng: place.lng() });
@@ -92,14 +102,15 @@ export default function MapScreen() {
         googleAddressId: places[0].id,
       },
     });
-    toast.success('location selected successfully.');
+    toast.success('Location selected successfully');
     navigate('/shipping');
   };
+
   return (
     <div className="full-box">
       <LoadScript libraries={libs} googleMapsApiKey={googleApiKey}>
         <GoogleMap
-          id="smaple-map"
+          id="sample-map"
           mapContainerStyle={{ height: '100%', width: '100%' }}
           center={center}
           zoom={15}
@@ -111,13 +122,14 @@ export default function MapScreen() {
             onPlacesChanged={onPlacesChanged}
           >
             <div className="map-input-box">
-              <input type="text" placeholder="Enter your address"></input>
+              <input type="text" placeholder="Enter your address" />
               <Button type="button" onClick={onConfirm}>
                 Confirm
               </Button>
             </div>
           </StandaloneSearchBox>
-          <Marker position={location} onLoad={onMarkerLoad}></Marker>
+
+          <Marker position={location} onLoad={onMarkerLoad} />
         </GoogleMap>
       </LoadScript>
     </div>

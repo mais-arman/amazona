@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Store } from '../Store';
 import { getError } from '../utils';
+import api from '../api';
 
 export default function ForgetPasswordScreen() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function ForgetPasswordScreen() {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await Axios.post('/api/users/forget-password', {
+      const { data } = await api.post('/api/users/forget-password', {
         email,
       });
       toast.success(data.message);
@@ -39,7 +40,9 @@ export default function ForgetPasswordScreen() {
       <Helmet>
         <title>Forget Password</title>
       </Helmet>
+
       <h1 className="my-3">Forget Password</h1>
+
       <Form onSubmit={submitHandler}>
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>Email</Form.Label>
@@ -51,7 +54,7 @@ export default function ForgetPasswordScreen() {
         </Form.Group>
 
         <div className="mb-3">
-          <Button type="submit">submit</Button>
+          <Button type="submit">Submit</Button>
         </div>
       </Form>
     </Container>

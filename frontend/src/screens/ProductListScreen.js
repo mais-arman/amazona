@@ -65,7 +65,7 @@ export default function ProductListScreen() {
         dispatch({ type: 'FETCH_REQUEST' });
 
         // ✅ API instance + baseURL already includes /api
-        const { data } = await api.get(`/products/admin?page=${page}`, {
+        const { data } = await api.get(`/api/products/admin?page=${page}`, {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
@@ -92,7 +92,7 @@ export default function ProductListScreen() {
       try {
         dispatch({ type: 'DELETE_REQUEST' });
 
-        await api.delete(`/products/${product._id}`, {
+        await api.delete(`/api/products/${product._id}`, {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },

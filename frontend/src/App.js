@@ -54,7 +54,7 @@ function App() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-       const { data } = await api.get(`/products/categories`);
+       const { data } = await api.get(`/api/products/categories`);
         setCategories(data);
       } catch (err) {
         toast.error(getError(err));

@@ -7,6 +7,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getError } from '../utils';
+import api from '../api';
 
 export default function SigninScreen() {
   const navigate = useNavigate();
@@ -19,13 +20,16 @@ export default function SigninScreen() {
 
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
+
   const submitHandler = async (e) => {
     e.preventDefault();
+
     try {
-      const { data } = await Axios.post('/api/users/signin', {
+      const { data } = await api.post('/api/users/signin', {
         email,
         password,
       });
+
       ctxDispatch({ type: 'USER_SIGNIN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
       navigate(redirect || '/');
@@ -45,7 +49,9 @@ export default function SigninScreen() {
       <Helmet>
         <title>Sign In</title>
       </Helmet>
+
       <h1 className="my-3">Sign In</h1>
+
       <Form onSubmit={submitHandler}>
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>Email</Form.Label>
@@ -55,6 +61,7 @@ export default function SigninScreen() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </Form.Group>
+
         <Form.Group className="mb-3" controlId="password">
           <Form.Label>Password</Form.Label>
           <Form.Control
@@ -63,15 +70,18 @@ export default function SigninScreen() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </Form.Group>
+
         <div className="mb-3">
           <Button type="submit">Sign In</Button>
         </div>
+
         <div className="mb-3">
           New customer?{' '}
           <Link to={`/signup?redirect=${redirect}`}>Create your account</Link>
         </div>
+
         <div className="mb-3">
-          Forget Password? <Link to={`/forget-password`}>Reset Password</Link>
+          Forget Password? <Link to="/forget-password">Reset Password</Link>
         </div>
       </Form>
     </Container>

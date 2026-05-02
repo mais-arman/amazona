@@ -8,7 +8,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api'; // ✅ بدل axios
+import api from '../api'; 
 
 export default function CartScreen() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function CartScreen() {
   } = state;
 
   const updateCartHandler = async (item, quantity) => {
-    const { data } = await api.get(`/products/${item._id}`); // ✅ بدون /api
+    const { data } = await api.get(`/api/products/${item._id}`); // ✅ بدون /api
 
     if (data.countInStock < quantity) {
       window.alert('Sorry. Product is out of stock');

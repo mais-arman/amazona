@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Store } from '../Store';
 import { getError } from '../utils';
+import api from '../api';
 
 export default function ResetPasswordScreen() {
   const navigate = useNavigate();
@@ -26,17 +27,19 @@ export default function ResetPasswordScreen() {
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
+
     try {
-      await Axios.post('/api/users/reset-password', {
+      await api.post('/api/users/reset-password', {
         password,
         token,
       });
-      navigate('/signin');
       toast.success('Password updated successfully');
+      navigate('/signin');
     } catch (err) {
       toast.error(getError(err));
     }
@@ -49,7 +52,7 @@ export default function ResetPasswordScreen() {
       </Helmet>
       <h1 className="my-3">Reset Password</h1>
       <Form onSubmit={submitHandler}>
-        <Form.Group className="mb-3" controlId="password">
+        <Form.Group className="mb-3">
           <Form.Label>New Password</Form.Label>
           <Form.Control
             type="password"
@@ -57,18 +60,17 @@ export default function ResetPasswordScreen() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="confirmPassword">
-          <Form.Label>Confirm New Password</Form.Label>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Confirm Password</Form.Label>
           <Form.Control
             type="password"
-            onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </Form.Group>
 
-        <div className="mb-3">
-          <Button type="submit">Reset Password</Button>
-        </div>
+        <Button type="submit">Reset Password</Button>
       </Form>
     </Container>
   );
